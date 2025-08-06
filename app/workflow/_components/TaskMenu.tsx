@@ -26,7 +26,6 @@ function TaskMenuBtn({ taskType }: { taskType: TaskType }) {
   const task = TaskRegistry[taskType]
 
   const onDragStart = (event: React.DragEvent) => {
-    // must match FlowEditor#getData
     event.dataTransfer.setData('application/reactflow', taskType)
     event.dataTransfer.effectAllowed = 'move'
   }
