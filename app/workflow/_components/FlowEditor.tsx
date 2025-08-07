@@ -1,4 +1,3 @@
-// src/components/FlowEditor.tsx
 'use client'
 
 import { Workflows } from '@prisma/client'
@@ -20,9 +19,14 @@ import NodeComponent from './nodes/NodeComponent'
 import { CreateFlowNode } from '@/lib/workflow/createFlowNode'
 import { TaskType } from '@/types/task'
 import { AppNode } from '@/types/appNode'
+import DeletableEdge from './edges/DeletableEdge'
 
 const nodeTypes = {
   Node: NodeComponent,
+}
+
+const edgeTypes = {
+  default: DeletableEdge,
 }
 
 const snapGrid: [number, number] = [50, 50]
@@ -42,9 +46,7 @@ export default function FlowEditor({ workflow }: { workflow: Workflows }) {
       if (!flow.viewport) return
       const { x = 0, y = 0, zoom = 1 } = flow.viewport
       setViewport({ x, y, zoom })
-    } catch {
-      // invalid or missing definition
-    }
+    } catch {}
   }, [workflow.definition, setNodes, setEdges, setViewport])
 
   const onDragOver = useCallback((event: React.DragEvent) => {
@@ -69,17 +71,20 @@ export default function FlowEditor({ workflow }: { workflow: Workflows }) {
     [screenToFlowPosition, setNodes],
   )
 
-  const onConnect = useCallback((connection: Connection) => {
-    setEdges((edges) =>
-      addEdge(
-        {
-          ...connection,
-          animated: true,
-        },
-        edges,
-      ),
-    )
-  }, [setEdges])
+  const onConnect = useCallback(
+    (connection: Connection) => {
+      setEdges((edges) =>
+        addEdge(
+          {
+            ...connection,
+            animated: true,
+          },
+          edges,
+        ),
+      )
+    },
+    [setEdges],
+  )
 
   return (
     <main className="h-full w-full">
@@ -89,6 +94,7 @@ export default function FlowEditor({ workflow }: { workflow: Workflows }) {
         onEdgesChange={onEdgesChanges}
         onNodesChange={onNodesChanges}
         nodeTypes={nodeTypes}
+        edgeTypes={edgeTypes}
         snapToGrid
         snapGrid={snapGrid}
         fitViewOptions={fitViewOptions}
